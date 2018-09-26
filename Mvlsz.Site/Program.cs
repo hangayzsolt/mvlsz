@@ -20,11 +20,14 @@ namespace Mvlsz.Site
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>()
+                .UseContentRoot(Directory.GetCurrentDirectory())
                 .ConfigureAppConfiguration((hostingContext, config) =>
                 {
                     IHostingEnvironment env = hostingContext.HostingEnvironment;
-                    config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+                    config.SetBasePath(Directory.GetCurrentDirectory());
 
+                    config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+                    config.AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
                 });
     }
 }

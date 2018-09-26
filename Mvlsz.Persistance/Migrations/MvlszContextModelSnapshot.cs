@@ -28,31 +28,47 @@ namespace Mvlsz.Persistance.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Brand");
+                    b.ToTable("Role");
                 });
 
             modelBuilder.Entity("Mvlsz.Persistance.Entities.User", b =>
                 {
-                    b.Property<Guid>("UserId")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
+
+                    b.Property<int>("AccessFailedCount");
 
                     b.Property<Guid?>("ActivationCode");
 
-                    b.Property<string>("Email");
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(40);
 
-                    b.Property<bool>("IsActive");
+                    b.Property<bool>("EmailConfirmed")
+                        .ValueGeneratedOnAdd()
+                        .HasDefaultValue(false);
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasDefaultValue(false);
+
+                    b.Property<bool>("LockoutEnabled");
+
+                    b.Property<DateTimeOffset?>("LockoutEnd");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50);
 
-                    b.Property<byte[]>("Password");
+                    b.Property<string>("PasswordHash");
 
                     b.Property<byte[]>("Salt");
 
-                    b.Property<string>("UserName");
+                    b.Property<string>("UserName")
+                        .IsRequired()
+                        .HasMaxLength(20);
 
-                    b.HasKey("UserId");
+                    b.HasKey("Id");
 
                     b.ToTable("User");
                 });
