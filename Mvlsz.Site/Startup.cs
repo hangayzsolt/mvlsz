@@ -1,23 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Mvlsz.Persistance;
-using Mvlsz.Persistance.Entities;
-using Mvlsz.Persistance.Implementations;
-using Mvlsz.Persistance.Interfaces;
+using Microsoft.Extensions.Hosting;
 using Mvlsz.Site.Models;
-using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 
 namespace Mvlsz.Site
 {
@@ -40,27 +29,17 @@ namespace Mvlsz.Site
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-            //services.AddDbContext<ApplicationDbContext>(options =>
-            //    options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
-            services
-                .AddDbContextPool<MvlszContext>(options =>
-                    options.UseMySql(Configuration.GetConnectionString(nameof(MvlszContext)),
-                        mysqlOptions => mysqlOptions.ServerVersion(new Version(5, 5, 61), ServerType.MySql)));
+            services.AddScoped<SignInManager<IdentityUser>, SignInManager<IdentityUser>>();
+            services.AddScoped<UserManager<IdentityUser>, UserManager<IdentityUser>>();
 
-            services.AddScoped<SignInManager<User>, SignInManager<User>>();
-            services.AddScoped<UserManager<User>, UserManager<User>>();
+            services.AddDefaultIdentity<IdentityUser>();
 
-            services.AddDefaultIdentity<User>()
-                .AddEntityFrameworkStores<MvlszContext>();
-
-            services.AddTransient(typeof(IUnitOfWork), typeof(UnitOfWork));
-            services.AddTransient(typeof(IRepository<>), typeof(Repository<>));
+            
             services.AddTransient<IEmailService, EmailService>();
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Latest)
                 .AddRazorPagesOptions(options =>
                 {
-                    options.AllowAreas = true;
                     options.Conventions.AuthorizeAreaFolder("Identity", "/Account/Manage");
                     options.Conventions.AuthorizeAreaPage("Identity", "/Account/Logout");
                 });
@@ -68,7 +47,7 @@ namespace Mvlsz.Site
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
